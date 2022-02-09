@@ -56,22 +56,24 @@ void MainWindow::on_startBtn_pressed()
     ui->startBtn->setText("Stop");
 
     Mat frame;
+    clock_t t = clock();
+
     while(video.isOpened())
 
     {
+        t = clock();
         video >> frame;
-        cv::rectangle(frame, cv::Point(10, 10), cv::Point(401, 401), cv::Scalar(0, 0, 255), 1);
-
         if(!frame.empty())
         {
 
+            cv::rectangle(frame, cv::Point(10, 10), cv::Point(401, 401), cv::Scalar(0, 0, 255), 1);
             QImage qimg(frame.data,
                         frame.cols,
                         frame.rows,
                         frame.step,
                         QImage::Format_RGB888);
             //Create the rectangle
-            cv::Rect roi(10, 10, 401, 401);
+            cv::Rect roi(100, 100, 400, 400);
 
             cv::Mat image_roi = frame(roi);
             QImage imgroi(image_roi.data,
@@ -84,11 +86,13 @@ void MainWindow::on_startBtn_pressed()
 
             pixmap.setPixmap( QPixmap::fromImage(qimg.rgbSwapped()) );
             ui->graphicsView->fitInView(&pixmap, Qt::KeepAspectRatio);
-            int FPS = video.get(CAP_PROP_FPS);
-               ui->fps->setText(QString::number(FPS));
+            //int FPS = video.get(CAP_PROP_FPS);
+               //ui->fps->setText(QString::number(FPS));
             ui->label_2->setPixmap(QPixmap::fromImage(imgroi.rgbSwapped()));
 
         }
+        int FPS = 1000000.0 / (double)(clock() - t);
+        ui->fps->setText(QString::number(FPS));
         qApp->processEvents();
     }
 
